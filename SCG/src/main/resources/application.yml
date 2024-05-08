@@ -1,2 +1,10 @@
 server:
   port: 8080
+
+
+eureka:
+  client:
+    register-with-eureka: true #유레카 서버에 등록할것인가
+    fetch-registry: true #클라이언트의 정보를 가지고 올것인가 -> 클라이언트의 정보를 가지고 로드 밸런싱 수행
+    service-url:
+      defaultZone: http://admin:1234@localhost:8761/eureka

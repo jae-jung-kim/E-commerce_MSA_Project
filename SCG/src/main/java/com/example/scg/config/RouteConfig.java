@@ -13,11 +13,11 @@ public class RouteConfig {
 
         return builder.routes()
                 .route("user", r -> r.path("/user/**")
-                        .uri("http://localhost:8001"))
+                        .uri("lb://USER")) //로드 밸런싱을 통해 user서버가 scale out 되어도 scale out 된 서버를 eureka에서 찾아서 접속한다.
                 .route("order", r -> r.path("/order/**")
-                        .uri("http://localhost:8002"))
+                        .uri("lb://ORDER"))
                 .route("product", r -> r.path("/product/**")
-                        .uri("http://localhost:8003"))
+                        .uri("lb://PRODUCT"))
                 .build();
     }
 }
