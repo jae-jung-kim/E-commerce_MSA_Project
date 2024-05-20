@@ -13,6 +13,8 @@ public class RouteConfig {
 
         return builder.routes()
                 .route("user", r -> r.path("/user/**","/login","/logout")
+                        .filters(f -> f.addRequestHeader("user-request","user-request-header")//key,value형태로 입력
+                                        .addResponseHeader("user-response","user-response-header"))
                         .uri("lb://USER")) //로드 밸런싱을 통해 user서버가 scale out 되어도 scale out 된 서버를 eureka에서 찾아서 접속한다.
                 .route("order", r -> r.path("/order/**")
                         .uri("lb://ORDER"))
