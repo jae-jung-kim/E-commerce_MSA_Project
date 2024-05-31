@@ -71,7 +71,7 @@ public class SecurityConfig {
         //필터에서 인증을 마친 요청에 대해서 특정 경로에 대한 인가 작업을 진행한다.
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/user/create","/user","/user/test").permitAll()
+                        .requestMatchers("/login", "/", "/user/create","/user").permitAll()
                         .requestMatchers("/verify-email","/verification-code").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/reissue").permitAll()

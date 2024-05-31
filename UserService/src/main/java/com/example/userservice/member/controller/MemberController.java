@@ -3,12 +3,14 @@ package com.example.userservice.member.controller;
 import com.example.userservice.member.dto.MemberForm;
 import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -37,5 +39,11 @@ public class MemberController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         memberService.deleteMember(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping
+    public String mainP(){ //test
+        return "user Controller";
     }
 }
