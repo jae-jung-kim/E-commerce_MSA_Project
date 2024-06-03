@@ -72,8 +72,6 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "/user/create","/user").permitAll()
-                        .requestMatchers("/verify-email","/verification-code").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/reissue").permitAll()
                         .anyRequest().authenticated()); //그외 나머지 요청에 대해서는 로그인한 사용자만 접근가능
 

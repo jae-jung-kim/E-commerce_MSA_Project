@@ -23,7 +23,7 @@ public class MemberController {
     public ResponseEntity<Member> create(@RequestBody MemberForm MemberDto){
         Member createdMember = memberService.createMember(MemberDto);
         return (createdMember != null) ?
-                ResponseEntity.status(HttpStatus.OK).body(createdMember) :
+                ResponseEntity.status(HttpStatus.CREATED).body(createdMember) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
