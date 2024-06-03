@@ -6,7 +6,9 @@ import com.example.userservice.exception.ExceptionCode;
 import com.example.userservice.member.dto.MemberForm;
 import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +16,17 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.memberRepository = memberRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+    //@RequiredArgsConstructor 어노테이션으로 인해 생략가능
+//  public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+//      this.memberRepository = memberRepository;
+//      this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+//  }
 
     public Member createMember(MemberForm memberDto) {
         //memberEntity생성
