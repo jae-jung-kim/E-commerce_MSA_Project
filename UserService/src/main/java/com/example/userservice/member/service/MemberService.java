@@ -1,17 +1,21 @@
 package com.example.userservice.member.service;
 
 
+import com.example.userservice.config.AppConfig;
 import com.example.userservice.exception.BusinessLogicException;
 import com.example.userservice.exception.ExceptionCode;
-import com.example.userservice.member.dto.MemberForm;
+import com.example.userservice.member.dto.MemberDto;
+import com.example.userservice.member.dto.ResponseOrder;
 import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +25,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AppConfig appConfig;
 
     //@RequiredArgsConstructor 어노테이션으로 인해 생략가능
 //  public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -28,7 +33,7 @@ public class MemberService {
 //      this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 //  }
 
-    public Member createMember(MemberForm memberDto) {
+    public Member createMember(MemberDto memberDto) {
         //memberEntity생성
         Member member = memberDto.toEntity();
         //name과 email이 존재(중복)하는지 확인
@@ -42,7 +47,7 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Member updateMember(Long memberId, MemberForm dto) {
+    public Member updateMember(Long memberId, MemberDto dto) {
         // 1. DTO -> 엔티티 변환하기
         Member member = dto.toEntity();
         // 2. 타깃 조회하기
@@ -75,6 +80,20 @@ public class MemberService {
 
         // 3. 대상 refreshToken삭제하기
         memberRepository.save(target);
+    }
+
+    public Iterable<Member> getMemberByAll(){
+        return memberRepository.findAll();
+    }
+
+    public Member getMemberByMemberId(Long memberId){
+        Member member = findVerifiedmember(memberId);
+        MemberDto memberDto = appConfig.modelMapper().map(member, MemberDto.class);
+
+        List<ResponseOrder> orders = new ArrayList<>();
+        memberDto.setOrders(orders);
+
+        return null;
     }
 
     //닉네임 중복 하는지 확인

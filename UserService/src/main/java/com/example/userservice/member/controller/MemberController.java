@@ -1,6 +1,6 @@
 package com.example.userservice.member.controller;
 
-import com.example.userservice.member.dto.MemberForm;
+import com.example.userservice.member.dto.MemberDto;
 import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class MemberController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Member> create(@RequestBody MemberForm MemberDto){
+    public ResponseEntity<Member> create(@RequestBody MemberDto MemberDto){
         Member createdMember = memberService.createMember(MemberDto);
         return (createdMember != null) ?
                 ResponseEntity.status(HttpStatus.CREATED).body(createdMember) :
@@ -30,7 +30,7 @@ public class MemberController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Member> update(@PathVariable Long id, @RequestBody MemberForm dto) {
+    public ResponseEntity<Member> update(@PathVariable Long id, @RequestBody MemberDto dto) {
         Member updated = memberService.updateMember(id, dto);
         return (updated != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(updated) :
@@ -43,8 +43,15 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Member> getMember(@PathVariable Long id){
+        Member response = memberService.findVerifiedmember(id);
+        return (response != null) ?
+                ResponseEntity.status(HttpStatus.OK).body(response) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 
-    @GetMapping
+    @GetMapping("test")
     public String mainP(){ //test
         return String.format("user Controller Port %s", env.getProperty("local.server.port"));
     }
