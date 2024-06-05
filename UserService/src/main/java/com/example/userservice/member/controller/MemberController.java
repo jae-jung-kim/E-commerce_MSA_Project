@@ -1,6 +1,8 @@
 package com.example.userservice.member.controller;
 
+import com.example.userservice.config.AppConfig;
 import com.example.userservice.member.dto.MemberDto;
+import com.example.userservice.member.dto.ResponseUserDto;
 import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.service.MemberService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 @Slf4j
@@ -16,9 +22,11 @@ public class MemberController {
 
     private final MemberService memberService;
     private final Environment env;
-    public MemberController(MemberService memberService, Environment env) {
+    private final AppConfig appConfig;
+    public MemberController(MemberService memberService, Environment env, AppConfig appConfig) {
         this.memberService = memberService;
         this.env = env;
+        this.appConfig = appConfig;
     }
 
     @PostMapping("/create")
@@ -48,6 +56,20 @@ public class MemberController {
         Member response = memberService.findVerifiedmember(id);
         return (response != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<ResponseUserDto>> getMembers(){
+        Iterable<Member> memberList = memberService.getMemberByAll();
+
+        List<ResponseUserDto> result = new ArrayList<>();
+        memberList.forEach(v -> {
+            result.add(appConfig.modelMapper().map(v, ResponseUserDto.class));
+        });
+
+        return (result.isEmpty()) ?
+                ResponseEntity.status(HttpStatus.OK).body(result) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 

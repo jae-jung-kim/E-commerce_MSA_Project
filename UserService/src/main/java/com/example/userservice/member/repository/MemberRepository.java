@@ -15,5 +15,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByIdAndUseYn(Long memberId, Member.UseYn useYn);
     Optional<Member> findByNameAndUseYn(String Name, Member.UseYn useYn);
     Optional<Member> findByEmailAndUseYn(String Email, Member.UseYn useYn);
-    Member findByUserId(Long memberId);
 }
