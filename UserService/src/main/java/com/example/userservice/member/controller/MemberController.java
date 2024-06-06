@@ -60,7 +60,7 @@ public class MemberController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    @GetMapping("/users")
+    @GetMapping("/all")
     public ResponseEntity<List<ResponseUserDto>> getMembers(){
         Iterable<Member> memberList = memberService.getMemberByAll();
 
