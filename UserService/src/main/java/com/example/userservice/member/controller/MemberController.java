@@ -52,10 +52,11 @@ public class MemberController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Member> getMember(@PathVariable Long id){
+    public ResponseEntity<ResponseUserDto> getMember(@PathVariable Long id){
         Member response = memberService.findVerifiedmember(id);
-        return (response != null) ?
-                ResponseEntity.status(HttpStatus.OK).body(response) :
+        ResponseUserDto ResponseMemberDto = appConfig.modelMapper().map(response, ResponseUserDto.class);
+        return (ResponseMemberDto != null) ?
+                ResponseEntity.status(HttpStatus.OK).body(ResponseMemberDto) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -67,8 +68,7 @@ public class MemberController {
         memberList.forEach(v -> {
             result.add(appConfig.modelMapper().map(v, ResponseUserDto.class));
         });
-
-        return (result.isEmpty()) ?
+        return (!result.isEmpty()) ?
                 ResponseEntity.status(HttpStatus.OK).body(result) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }

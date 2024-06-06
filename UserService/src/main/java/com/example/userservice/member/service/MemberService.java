@@ -115,7 +115,6 @@ public class MemberService {
     //멤버가 존재하는지, 회원상태가 Y인 상태인지 확인
     public Member findVerifiedmember(long memberId){
         Optional<Member> optionalMember = memberRepository.findByIdAndUseYn(memberId, Member.UseYn.Y);
-
         Member findMember = optionalMember.orElseThrow(()->new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
 
         return findMember;
