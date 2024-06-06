@@ -42,8 +42,12 @@ public class ArticleController {
     }
 
     @GetMapping("{article_id}") //물품 상세 조회
-    public Article show(@PathVariable Long article_id){
-        return articleService.show(article_id);
+    public ResponseEntity<ResponseArticle> show(@PathVariable Long article_id){
+        Article article = articleService.show(article_id);
+        ResponseArticle responseArticle = appConfig.modelMapper().map(article, ResponseArticle.class);
+        return (responseArticle != null) ?
+                ResponseEntity.status(HttpStatus.OK).body(responseArticle) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @PostMapping("/create")
