@@ -10,13 +10,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @Setter
 @ToString
-public class ArticleForm {
+public class ArticleDto {
 
 
     private String name;
     private String status;
     private int price;
-    private String quantity;
+    private int quantity;
 
     public Article toEntity() {
         return new Article(name, status, price, quantity);

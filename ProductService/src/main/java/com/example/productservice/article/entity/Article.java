@@ -20,9 +20,9 @@ public class Article {
     @Column
     private String status;
     @Column
-    private int price;
+    private Integer price;
     @Column
-    private String quantity;
+    private Integer quantity;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -30,14 +30,7 @@ public class Article {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    @Enumerated(EnumType.STRING)
-    private UseYn useYn;
-    public enum UseYn{
-        Y, //판매중
-        N //판매종료
-    }
-
-    public Article(String name, String status, int price, String quantity) {
+    public Article(String name, String status, int price, int quantity) {
         this.name = name;
         this.status = status;
         this.price = price;

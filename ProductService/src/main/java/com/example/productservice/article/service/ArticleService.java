@@ -1,6 +1,6 @@
 package com.example.productservice.article.service;
 
-import com.example.productservice.article.dto.ArticleForm;
+import com.example.productservice.article.dto.ArticleDto;
 import com.example.productservice.article.entity.Article;
 import com.example.productservice.article.repository.ArticleRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class ArticleService {
     }
 
     //물품 전체 조회
-    public List<Article> index() {
+    public Iterable<Article> getAllProducts() {
         return articleRepository.findAll();
     }
 
@@ -28,7 +28,7 @@ public class ArticleService {
         return articleRepository.findById(id).orElse(null);
     }
 
-    public Article createArticle(ArticleForm dto) {
+    public Article createArticle(ArticleDto dto) {
         Article article = dto.toEntity();
         if(article.getId() != null){
             return null;
