@@ -23,7 +23,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         this.env = env;
     }
 
-    public static class Config{
+    public static class Config {
 
     }
 
@@ -40,9 +40,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             }
 
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-            String jwt = authorizationHeader.replace("Bearer","");
+            String jwt = authorizationHeader.replace("Bearer", "");
 
-            if(!isJwtValid(jwt)){
+            if (!isJwtValid(jwt)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
             return chain.filter(exchange);
@@ -50,22 +50,29 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     }
 
     private boolean isJwtValid(String jwt) {
-        boolean returnValue  = true;
+        boolean returnValue = true;
 
         String subject = null;
 
-        subject = Jwts.parser().setSigningKey(env.getProperty("spring.jwt.secret"))
-                .parseClaimsJws(jwt).getBody()
-                .getSubject();
+        try {
+            subject = Jwts.parser().setSigningKey(env.getProperty("spring.jwt.secret"))
+                    .parseClaimsJws(jwt).getBody()
+                    .getSubject();
+        } catch (Exception ex) {
+            returnValue = false;
+        }
+        if (subject == null || subject.isEmpty()) {
+            returnValue = false;
+        }
         return returnValue;
     }
 
     // Mono, Flux -> Spring WebFlux
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
-        ServerHttpResponse  response = exchange.getResponse(); //기존 MVC를 사용하면 HTTP sublet이라는 response사용
+        ServerHttpResponse response = exchange.getResponse(); //기존 MVC를 사용하면 HTTP sublet이라는 response사용
         response.setStatusCode(httpStatus);
 
-        log.error(err);
+        log.info(err);
         return response.setComplete(); //Mono타입으로 return
     }
 }
