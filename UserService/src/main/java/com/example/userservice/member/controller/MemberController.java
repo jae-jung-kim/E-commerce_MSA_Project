@@ -68,7 +68,7 @@ public class MemberController {
         memberList.forEach(v -> {
             result.add(appConfig.modelMapper().map(v, ResponseUserDto.class));
         });
-        return (!result.isEmpty()) ?
+        return(!result.isEmpty()) ?
                 ResponseEntity.status(HttpStatus.OK).body(result) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
