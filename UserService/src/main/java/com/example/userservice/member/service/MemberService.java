@@ -117,7 +117,7 @@ public class MemberService {
         Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
 
         /* restTemplate 사용 */
-        String orderUrl = String.format(env.getProperty("order_service.url"), memberId); //%s는 userId
+        String orderUrl = String.format(env.getProperty("order_service.url"), memberId); //order_service.url = http://localhost:8080/order/%s/orders
         ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
                 new ParameterizedTypeReference<List<ResponseOrder>>() {
                 });
