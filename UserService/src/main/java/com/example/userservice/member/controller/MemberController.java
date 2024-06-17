@@ -53,7 +53,7 @@ public class MemberController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseUserDto> getMember(@PathVariable Long id){
-        Member response = memberService.findVerifiedmember(id);
+        MemberDto response = memberService.findVerifiedmember(id);
         ResponseUserDto ResponseMemberDto = appConfig.modelMapper().map(response, ResponseUserDto.class);
         return (ResponseMemberDto != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(ResponseMemberDto) :

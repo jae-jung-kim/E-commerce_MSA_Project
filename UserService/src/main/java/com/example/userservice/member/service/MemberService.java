@@ -10,9 +10,13 @@ import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +30,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AppConfig appConfig;
+
+    private final Environment env;
+    private final RestTemplate restTemplate;
 
     //@RequiredArgsConstructor 어노테이션으로 인해 생략가능
 //  public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -51,7 +58,9 @@ public class MemberService {
         // 1. DTO -> 엔티티 변환하기
         Member member = dto.toEntity();
         // 2. 타깃 조회하기
-        Member target = findVerifiedmember(memberId);
+        MemberDto targets = findVerifiedmember(memberId);
+        Member target = appConfig.modelMapper().map(targets, Member.class);
+
         log.info(member.toString());
         // 3. 정보 업데이트
         Optional.ofNullable(member.getEmail())
@@ -59,7 +68,7 @@ public class MemberService {
         Optional.ofNullable(member.getAddress())
                 .ifPresent(target::setAddress);
         Optional.ofNullable(member.getPassword())
-                .ifPresent(password-> {
+                .ifPresent(password -> {
                     target.setPassword(bCryptPasswordEncoder.encode(password));
                 }); // 업데이트 할때도 패스워드가 암호화
         Optional.ofNullable(member.getName())
@@ -73,7 +82,7 @@ public class MemberService {
 
     public void deleteMember(Long id) {
         // 1. 대상 찾기
-        Member target = memberRepository.findById(id).orElseThrow(()->new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        Member target = memberRepository.findById(id).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
 
         // 2. 대상 삭제하기(softdelete)
         target.setUseYn(Member.UseYn.N);
@@ -82,41 +91,42 @@ public class MemberService {
         memberRepository.save(target);
     }
 
-    public Iterable<Member> getMemberByAll(){
+    public Iterable<Member> getMemberByAll() {
         return memberRepository.findAll();
     }
 
-    public Member getMemberByMemberId(Long memberId){
-        Member member = findVerifiedmember(memberId);
-        MemberDto memberDto = appConfig.modelMapper().map(member, MemberDto.class);
-
-        List<ResponseOrder> orders = new ArrayList<>();
-        memberDto.setOrders(orders);
-
-        return null;
-    }
-
     //닉네임 중복 하는지 확인
-    public void verifyExistsName(String nickname){
+    public void verifyExistsName(String nickname) {
         Optional<Member> member = memberRepository.findByNameAndUseYn(nickname, Member.UseYn.Y);
-        if(member.isPresent()){
+        if (member.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
         }
     }
 
     //이메일 중복 하는지 확인
-    public void verifyExistsEmail(String email){
+    public void verifyExistsEmail(String email) {
         Optional<Member> member = memberRepository.findByEmailAndUseYn(email, Member.UseYn.Y);
-        if(member.isPresent()){
+        if (member.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.EMAIL_EXISTS);
         }
     }
 
     //멤버가 존재하는지, 회원상태가 Y인 상태인지 확인
-    public Member findVerifiedmember(long memberId){
+    public MemberDto findVerifiedmember(long memberId) {
         Optional<Member> optionalMember = memberRepository.findByIdAndUseYn(memberId, Member.UseYn.Y);
-        Member findMember = optionalMember.orElseThrow(()->new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
+        Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
 
-        return findMember;
+        /* restTemplate 사용 */
+        String orderUrl = String.format(env.getProperty("order_service.url"), memberId); //%s는 userId
+        ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+                new ParameterizedTypeReference<List<ResponseOrder>>() {
+                });
+
+        List<ResponseOrder> ordersList = orderListResponse.getBody();
+        MemberDto memberDto = appConfig.modelMapper().map(findMember, MemberDto.class);
+
+        memberDto.setOrders(ordersList);
+
+        return memberDto;
     }
 }

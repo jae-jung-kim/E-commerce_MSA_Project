@@ -30,7 +30,7 @@ public class RouteConfig {
                 .route("user", r -> r.path("/logout")
                         .uri("lb://USER"))
                 .route("order", r -> r.path("/order/**")
-                        .filters(f -> f.filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
+                        //.filters(f -> f.filter(authorizationHeaderFilter.apply(new AuthorizationHeaderFilter.Config())))
                         .uri("lb://ORDER"))
                 .route("product", r -> r.path("/product/**")
                         .uri("lb://PRODUCT"))
