@@ -1,6 +1,7 @@
 package com.example.userservice.member.service;
 
 
+import com.example.userservice.client.OrderServiceClient;
 import com.example.userservice.config.AppConfig;
 import com.example.userservice.exception.BusinessLogicException;
 import com.example.userservice.exception.ExceptionCode;
@@ -32,7 +33,9 @@ public class MemberService {
     private final AppConfig appConfig;
 
     private final Environment env;
-    private final RestTemplate restTemplate;
+    // private final RestTemplate restTemplate;
+
+    private final OrderServiceClient orderServiceClient;
 
     //@RequiredArgsConstructor 어노테이션으로 인해 생략가능
 //  public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -117,12 +120,15 @@ public class MemberService {
         Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
 
         /* restTemplate 사용 */
-        String orderUrl = String.format(env.getProperty("order_service.url"), memberId); //order_service.url = http://localhost:8080/order/%s/orders
-        ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
-                new ParameterizedTypeReference<List<ResponseOrder>>() {
-                });
+//        String orderUrl = String.format(env.getProperty("order_service.url"), memberId); //order_service.url = http://localhost:8080/order/%s/orders
+//        ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+//                new ParameterizedTypeReference<List<ResponseOrder>>() {
+//                });
+//        List<ResponseOrder> ordersList = orderListResponse.getBody();
 
-        List<ResponseOrder> ordersList = orderListResponse.getBody();
+
+        /* feign client 사용 */
+        List<ResponseOrder> ordersList = orderServiceClient.getOrders(memberId);
         MemberDto memberDto = appConfig.modelMapper().map(findMember, MemberDto.class);
 
         memberDto.setOrders(ordersList);
