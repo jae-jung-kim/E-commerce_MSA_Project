@@ -9,6 +9,7 @@ import com.example.userservice.member.dto.MemberDto;
 import com.example.userservice.member.dto.ResponseOrder;
 import com.example.userservice.member.entity.Member;
 import com.example.userservice.member.repository.MemberRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -128,7 +129,13 @@ public class MemberService {
 
 
         /* feign client 사용 */
-        List<ResponseOrder> ordersList = orderServiceClient.getOrders(memberId);
+
+        List<ResponseOrder> ordersList = null;
+        try{
+            ordersList = orderServiceClient.getOrders(memberId);
+        }catch(FeignException ex){
+            log.error(ex.getMessage());
+        }
         MemberDto memberDto = appConfig.modelMapper().map(findMember, MemberDto.class);
 
         memberDto.setOrders(ordersList);
