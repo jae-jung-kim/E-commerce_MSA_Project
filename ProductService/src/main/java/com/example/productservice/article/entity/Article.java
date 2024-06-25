@@ -16,9 +16,9 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
-    private String name;
+    private String productId;
     @Column
-    private String status;
+    private String name;
     @Column
     private Integer price;
     @Column
@@ -30,9 +30,9 @@ public class Article {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Article(String name, String status, int price, int quantity) {
+    public Article(String name, String productId, int price, int quantity) {
         this.name = name;
-        this.status = status;
+        this.productId = productId;
         this.price = price;
         this.quantity = quantity;
     }
