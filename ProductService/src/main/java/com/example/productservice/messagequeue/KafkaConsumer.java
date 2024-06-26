@@ -32,11 +32,10 @@ public class KafkaConsumer {
     @KafkaListener(topics = "example-product-topic")
     public void updateQty(String kafkaMessage){
         log.info("Kafka Message: ->" + kafkaMessage);
-        ObjectMapper mapper = new ObjectMapper();
 
         Map<Object, Object> map = new HashMap<>();
         try{
-            map = mapper.readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {
+            map = appCOnfig.objectMapper().readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {
             });
         } catch(JsonProcessingException ex){
             ex.printStackTrace();
