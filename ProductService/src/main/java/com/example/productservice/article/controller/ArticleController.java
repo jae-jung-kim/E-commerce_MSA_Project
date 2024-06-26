@@ -4,7 +4,7 @@ import com.example.productservice.article.dto.ArticleDto;
 import com.example.productservice.article.dto.ResponseArticle;
 import com.example.productservice.article.entity.Article;
 import com.example.productservice.article.service.ArticleService;
-import com.example.productservice.config.AppConfig;
+import com.example.productservice.config.ProductAppConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -21,12 +21,12 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final Environment env;
-    private final AppConfig appConfig;
+    private final ProductAppConfig productAppConfig;
 
-    public ArticleController(ArticleService articleService, Environment env, AppConfig appConfig) {
+    public ArticleController(ArticleService articleService, Environment env, ProductAppConfig productAppConfig) {
         this.articleService = articleService;
         this.env = env;
-        this.appConfig = appConfig;
+        this.productAppConfig = productAppConfig;
     }
 
     @GetMapping("/all") //물품 모두 조회
@@ -35,7 +35,7 @@ public class ArticleController {
 
         List<ResponseArticle> result = new ArrayList<>();
         articleList.forEach(v -> {
-            result.add(appConfig.modelMapper().map(v, ResponseArticle.class));
+            result.add(productAppConfig.modelMapper().map(v, ResponseArticle.class));
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
@@ -44,7 +44,7 @@ public class ArticleController {
     @GetMapping("{article_id}") //물품 상세 조회
     public ResponseEntity<ResponseArticle> show(@PathVariable Long article_id){
         Article article = articleService.show(article_id);
-        ResponseArticle responseArticle = appConfig.modelMapper().map(article, ResponseArticle.class);
+        ResponseArticle responseArticle = productAppConfig.modelMapper().map(article, ResponseArticle.class);
         return (responseArticle != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(responseArticle) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

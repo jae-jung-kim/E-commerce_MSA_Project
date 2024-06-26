@@ -2,30 +2,26 @@ package com.example.productservice.messagequeue;
 
 import com.example.productservice.article.entity.Article;
 import com.example.productservice.article.repository.ArticleRepository;
-import com.example.productservice.config.AppConfig;
+import com.example.productservice.config.ProductAppConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.lang.runtime.ObjectMethods;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class KafkaConsumer {
     ArticleRepository articleRepository;
-    AppConfig appCOnfig;
+    ProductAppConfig productAppCOnfig;
     @Autowired
-    public KafkaConsumer(ArticleRepository articleRepository, AppConfig appCOnfig) {
+    public KafkaConsumer(ArticleRepository articleRepository, ProductAppConfig productAppCOnfig) {
         this.articleRepository = articleRepository;
-        this.appCOnfig = appCOnfig;
+        this.productAppCOnfig = productAppCOnfig;
     }
 
     //토픽에 데이터가 업데이트되면 수량 데이터가 같이 업데이트 됨.
@@ -35,7 +31,7 @@ public class KafkaConsumer {
 
         Map<Object, Object> map = new HashMap<>();
         try{
-            map = appCOnfig.objectMapper().readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {
+            map = productAppCOnfig.objectMapper().readValue(kafkaMessage, new TypeReference<Map<Object, Object>>() {
             });
         } catch(JsonProcessingException ex){
             ex.printStackTrace();
