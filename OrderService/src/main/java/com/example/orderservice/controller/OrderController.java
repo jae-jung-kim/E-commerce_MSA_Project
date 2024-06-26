@@ -3,6 +3,7 @@ package com.example.orderservice.controller;
 import com.example.orderservice.config.OrderAppConfig;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
+import com.example.orderservice.messagequeue.KafkaProducerOrder;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.vo.RequestOrder;
 import com.example.orderservice.vo.ResponseOrder;
@@ -22,15 +23,17 @@ import java.util.List;
 @RequestMapping("/order")
 @Slf4j
 public class OrderController {
-    Environment env;
-    OrderService orderService;
-    OrderAppConfig orderAppConfig;
+    private final Environment env;
+    private final OrderService orderService;
+    private final OrderAppConfig orderAppConfig;
+    private final KafkaProducerOrder kafkaProducerOrder;
 
     @Autowired
-    public OrderController(Environment env, OrderService orderService, OrderAppConfig orderAppConfig) {
+    public OrderController(Environment env, OrderService orderService, OrderAppConfig orderAppConfig, KafkaProducerOrder kafkaProducerOrder) {
         this.env = env;
         this.orderService = orderService;
         this.orderAppConfig = orderAppConfig;
+        this.kafkaProducerOrder = kafkaProducerOrder;
     }
 
     @PostMapping("/{userId}/orders")

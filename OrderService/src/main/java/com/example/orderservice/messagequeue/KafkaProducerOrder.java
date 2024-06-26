@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class KafkaProducer {
-    private KafkaTemplate<String,  String>  kafkaTemplate;
-    private OrderAppConfig orderAppConfig;
+public class KafkaProducerOrder {
+    private final KafkaTemplate<String,  String>  kafkaTemplate;
+    private final OrderAppConfig orderAppConfig;
 
     @Autowired
-    public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate, OrderAppConfig orderAppConfig) {
+    public KafkaProducerOrder(KafkaTemplate<String, String> kafkaTemplate, OrderAppConfig orderAppConfig) {
         this.kafkaTemplate = kafkaTemplate;
         this.orderAppConfig = orderAppConfig;
     }
