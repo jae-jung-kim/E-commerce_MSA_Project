@@ -1,6 +1,6 @@
 package com.example.userservice.member.controller;
 
-import com.example.userservice.config.AppConfig;
+import com.example.userservice.config.UserAppConfig;
 import com.example.userservice.member.dto.MemberDto;
 import com.example.userservice.member.dto.ResponseUserDto;
 import com.example.userservice.member.entity.Member;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -22,11 +21,11 @@ public class MemberController {
 
     private final MemberService memberService;
     private final Environment env;
-    private final AppConfig appConfig;
-    public MemberController(MemberService memberService, Environment env, AppConfig appConfig) {
+    private final UserAppConfig userAppConfig;
+    public MemberController(MemberService memberService, Environment env, UserAppConfig userAppConfig) {
         this.memberService = memberService;
         this.env = env;
-        this.appConfig = appConfig;
+        this.userAppConfig = userAppConfig;
     }
 
     @PostMapping("/create")
@@ -54,7 +53,7 @@ public class MemberController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseUserDto> getMember(@PathVariable Long id){
         MemberDto response = memberService.findVerifiedmember(id);
-        ResponseUserDto ResponseMemberDto = appConfig.modelMapper().map(response, ResponseUserDto.class);
+        ResponseUserDto ResponseMemberDto = userAppConfig.modelMapper().map(response, ResponseUserDto.class);
         return (ResponseMemberDto != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(ResponseMemberDto) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -66,7 +65,7 @@ public class MemberController {
 
         List<ResponseUserDto> result = new ArrayList<>();
         memberList.forEach(v -> {
-            result.add(appConfig.modelMapper().map(v, ResponseUserDto.class));
+            result.add(userAppConfig.modelMapper().map(v, ResponseUserDto.class));
         });
         return(!result.isEmpty()) ?
                 ResponseEntity.status(HttpStatus.OK).body(result) :

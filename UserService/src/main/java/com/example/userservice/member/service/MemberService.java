@@ -2,7 +2,7 @@ package com.example.userservice.member.service;
 
 
 import com.example.userservice.client.OrderServiceClient;
-import com.example.userservice.config.AppConfig;
+import com.example.userservice.config.UserAppConfig;
 import com.example.userservice.exception.BusinessLogicException;
 import com.example.userservice.exception.ExceptionCode;
 import com.example.userservice.member.dto.MemberDto;
@@ -12,15 +12,10 @@ import com.example.userservice.member.repository.MemberRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +26,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final AppConfig appConfig;
+    private final UserAppConfig userAppConfig;
 
     private final Environment env;
     // private final RestTemplate restTemplate;
@@ -63,7 +58,7 @@ public class MemberService {
         Member member = dto.toEntity();
         // 2. 타깃 조회하기
         MemberDto targets = findVerifiedmember(memberId);
-        Member target = appConfig.modelMapper().map(targets, Member.class);
+        Member target = userAppConfig.modelMapper().map(targets, Member.class);
 
         log.info(member.toString());
         // 3. 정보 업데이트
@@ -136,7 +131,7 @@ public class MemberService {
         }catch(FeignException ex){
             log.error(ex.getMessage());
         }
-        MemberDto memberDto = appConfig.modelMapper().map(findMember, MemberDto.class);
+        MemberDto memberDto = userAppConfig.modelMapper().map(findMember, MemberDto.class);
 
         memberDto.setOrders(ordersList);
 
