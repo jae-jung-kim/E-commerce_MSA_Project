@@ -1,6 +1,6 @@
 package com.example.orderservice.controller;
 
-import com.example.orderservice.config.AppConfig;
+import com.example.orderservice.config.OrderAppConfig;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.service.OrderService;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/order")
@@ -25,20 +24,20 @@ import java.util.UUID;
 public class OrderController {
     Environment env;
     OrderService orderService;
-    AppConfig appConfig;
+    OrderAppConfig orderAppConfig;
 
     @Autowired
-    public OrderController(Environment env, OrderService orderService, AppConfig appConfig) {
+    public OrderController(Environment env, OrderService orderService, OrderAppConfig orderAppConfig) {
         this.env = env;
         this.orderService = orderService;
-        this.appConfig = appConfig;
+        this.orderAppConfig = orderAppConfig;
     }
 
     @PostMapping("/{userId}/orders")
     public ResponseEntity<ResponseOrder> createOrder(@PathVariable("userId") String userId,
                                                      @RequestBody RequestOrder orderDetails) {
 
-        ModelMapper mapper = appConfig.modelMapper();
+        ModelMapper mapper = orderAppConfig.modelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
         OrderDto orderDto = mapper.map(orderDetails, OrderDto.class);
@@ -56,7 +55,7 @@ public class OrderController {
 
         List<ResponseOrder> result = new ArrayList<>();
         orderList.forEach(v -> {
-            result.add(appConfig.modelMapper().map(v, ResponseOrder.class));
+            result.add(orderAppConfig.modelMapper().map(v, ResponseOrder.class));
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(result);

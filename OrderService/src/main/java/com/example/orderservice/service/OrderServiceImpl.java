@@ -1,6 +1,6 @@
 package com.example.orderservice.service;
 
-import com.example.orderservice.config.AppConfig;
+import com.example.orderservice.config.OrderAppConfig;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.jpa.OrderRepository;
@@ -15,11 +15,11 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService{
 
     OrderRepository orderRepository;
-    AppConfig appConfig;
+    OrderAppConfig orderAppConfig;
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, AppConfig appConfig) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderAppConfig orderAppConfig) {
         this.orderRepository = orderRepository;
-        this.appConfig = appConfig;
+        this.orderAppConfig = orderAppConfig;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class OrderServiceImpl implements OrderService{
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(orderDto.getQty() * orderDto.getUnitPrice());
 
-        ModelMapper mapper = appConfig.modelMapper();
+        ModelMapper mapper = orderAppConfig.modelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         OrderEntity orderEntity = mapper.map(orderDto, OrderEntity.class);
 
@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderDto getOrderByOrderId(String orderId) {
         OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
-        OrderDto orderDto = appConfig.modelMapper().map(orderEntity, OrderDto.class);
+        OrderDto orderDto = orderAppConfig.modelMapper().map(orderEntity, OrderDto.class);
 
         return orderDto;
     }
