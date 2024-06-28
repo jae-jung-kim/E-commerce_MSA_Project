@@ -3,10 +3,16 @@ package com.example.orderservice.messagequeue;
 import com.example.orderservice.config.OrderAppConfig;
 import com.example.orderservice.dto.OrderDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.util.concurrent.ListenableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.TimestampedException;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
@@ -20,14 +26,13 @@ public class KafkaProducerOrder {
         this.orderAppConfig = orderAppConfig;
     }
 
-    public OrderDto send(String topic, OrderDto orderDto){
+    public OrderDto send(String topic, OrderDto orderDto) throws ExecutionException, InterruptedException {
         String jsonInString = "";
         try{
             jsonInString = orderAppConfig.objectMapper().writeValueAsString(orderDto);
-        }catch(JsonProcessingException ex){
+        }catch(JsonProcessingException ex) {
             ex.printStackTrace();
         }
-
         kafkaTemplate.send(topic, jsonInString);
         log.info("Kafka Producer sent data from the Order microService: " + orderDto);
 

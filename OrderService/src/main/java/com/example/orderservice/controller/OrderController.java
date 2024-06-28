@@ -10,7 +10,6 @@ import com.example.orderservice.vo.ResponseOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/order")
@@ -28,7 +28,6 @@ public class OrderController {
     private final OrderAppConfig orderAppConfig;
     private final KafkaProducerOrder kafkaProducerOrder;
 
-    @Autowired
     public OrderController(Environment env, OrderService orderService, OrderAppConfig orderAppConfig, KafkaProducerOrder kafkaProducerOrder) {
         this.env = env;
         this.orderService = orderService;
@@ -38,16 +37,19 @@ public class OrderController {
 
     @PostMapping("/{userId}/orders")
     public ResponseEntity<ResponseOrder> createOrder(@PathVariable("userId") String userId,
-                                                     @RequestBody RequestOrder orderDetails) {
+                                                     @RequestBody RequestOrder orderDetails) throws ExecutionException, InterruptedException {
 
         ModelMapper mapper = orderAppConfig.modelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-
         OrderDto orderDto = mapper.map(orderDetails, OrderDto.class);
         orderDto.setUserId(userId);
         /* jpa */
         OrderDto createdOrder = orderService.createOrder(orderDto);
         ResponseOrder responseOrder = mapper.map(createdOrder, ResponseOrder.class);
+        log.info("say hello");
+
+        /* send this order to the kafka */
+        kafkaProducerOrder.send("example-product-topic",orderDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseOrder);
     }
