@@ -12,10 +12,13 @@ import com.example.userservice.member.repository.MemberRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,7 @@ public class MemberService {
     // private final RestTemplate restTemplate;
 
     private final OrderServiceClient orderServiceClient;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     //@RequiredArgsConstructor 어노테이션으로 인해 생략가능
 //  public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -115,25 +119,13 @@ public class MemberService {
         Optional<Member> optionalMember = memberRepository.findByIdAndUseYn(memberId, Member.UseYn.Y);
         Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
 
-        /* restTemplate 사용 */
-//        String orderUrl = String.format(env.getProperty("order_service.url"), memberId); //order_service.url = http://localhost:8080/order/%s/orders
-//        ResponseEntity<List<ResponseOrder>> orderListResponse = restTemplate.exchange(orderUrl, HttpMethod.GET, null,
-//                new ParameterizedTypeReference<List<ResponseOrder>>() {
-//                });
-//        List<ResponseOrder> ordersList = orderListResponse.getBody();
-
-
-        /* feign client 사용 */
-
-        List<ResponseOrder> ordersList = null;
-        try{
-            ordersList = orderServiceClient.getOrders(memberId);
-        }catch(FeignException ex){
-            log.error(ex.getMessage());
-        }
         MemberDto memberDto = userAppConfig.modelMapper().map(findMember, MemberDto.class);
 
-        memberDto.setOrders(ordersList);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+        List<ResponseOrder> orderList = circuitBreaker.run(()->orderServiceClient.getOrders(memberId),
+                throwable -> new ArrayList<>());
+
+        memberDto.setOrders(orderList);
 
         return memberDto;
     }
