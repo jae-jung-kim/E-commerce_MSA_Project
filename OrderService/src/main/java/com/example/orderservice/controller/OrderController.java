@@ -4,12 +4,14 @@ import com.example.orderservice.config.OrderAppConfig;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.messagequeue.KafkaProducerOrder;
+import com.example.orderservice.messagequeue.OrderProducer;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.vo.RequestOrder;
 import com.example.orderservice.vo.ResponseOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -27,12 +30,15 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderAppConfig orderAppConfig;
     private final KafkaProducerOrder kafkaProducerOrder;
+    private  final OrderProducer orderProducer;
 
-    public OrderController(Environment env, OrderService orderService, OrderAppConfig orderAppConfig, KafkaProducerOrder kafkaProducerOrder) {
+    @Autowired
+    public OrderController(Environment env, OrderService orderService, OrderAppConfig orderAppConfig, KafkaProducerOrder kafkaProducerOrder, OrderProducer orderProducer) {
         this.env = env;
         this.orderService = orderService;
         this.orderAppConfig = orderAppConfig;
         this.kafkaProducerOrder = kafkaProducerOrder;
+        this.orderProducer = orderProducer;
     }
 
     @PostMapping("/{userId}/orders")
@@ -41,15 +47,21 @@ public class OrderController {
 
         ModelMapper mapper = orderAppConfig.modelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
         OrderDto orderDto = mapper.map(orderDetails, OrderDto.class);
         orderDto.setUserId(userId);
         /* jpa */
-        OrderDto createdOrder = orderService.createOrder(orderDto);
-        ResponseOrder responseOrder = mapper.map(createdOrder, ResponseOrder.class);
-        log.info("say hello");
+//        OrderDto createdOrder = orderService.createOrder(orderDto);
+//        ResponseOrder responseOrder = mapper.map(createdOrder, ResponseOrder.class);
 
-        /* send this order to the kafka */
+        orderDto.setOrderId(UUID.randomUUID().toString());
+        orderDto.setTotalPrice(orderDetails.getQty() * orderDetails.getUnitPrice());
+
         kafkaProducerOrder.send("example-product-topic",orderDto);
+        orderProducer.send("orders", orderDto);
+        log.info("send success");
+
+        ResponseOrder responseOrder = mapper.map(orderDto, ResponseOrder.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseOrder);
     }

@@ -14,11 +14,11 @@ public class ArticleDto {
 
 
     private String name;
-    private String status;
+    private String productId;
     private int price;
     private int quantity;
 
     public Article toEntity() {
-        return new Article(name, status, price, quantity);
+        return new Article(name, productId, price, quantity);
     }
 }

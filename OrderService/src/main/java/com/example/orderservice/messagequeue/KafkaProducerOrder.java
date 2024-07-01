@@ -26,13 +26,14 @@ public class KafkaProducerOrder {
         this.orderAppConfig = orderAppConfig;
     }
 
-    public OrderDto send(String topic, OrderDto orderDto) throws ExecutionException, InterruptedException {
+    public OrderDto send(String topic, OrderDto orderDto){
         String jsonInString = "";
         try{
             jsonInString = orderAppConfig.objectMapper().writeValueAsString(orderDto);
         }catch(JsonProcessingException ex) {
             ex.printStackTrace();
         }
+        log.info("say hello");
         kafkaTemplate.send(topic, jsonInString);
         log.info("Kafka Producer sent data from the Order microService: " + orderDto);
 
