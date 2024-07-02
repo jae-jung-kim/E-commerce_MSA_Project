@@ -61,8 +61,7 @@ public class MemberService {
         // 1. DTO -> 엔티티 변환하기
         Member member = dto.toEntity();
         // 2. 타깃 조회하기
-        MemberDto targets = findVerifiedmember(memberId);
-        Member target = userAppConfig.modelMapper().map(targets, Member.class);
+        Member target = findVerifiedMember(memberId);
 
         log.info(member.toString());
         // 3. 정보 업데이트
@@ -128,5 +127,13 @@ public class MemberService {
         memberDto.setOrders(orderList);
 
         return memberDto;
+    }
+
+    //update 사용시 쓰는 메소드
+    public Member findVerifiedMember(long memberId) {
+        Optional<Member> optionalMember = memberRepository.findByIdAndUseYn(memberId, Member.UseYn.Y);
+        Member findMember = optionalMember.orElseThrow(() -> new BusinessLogicException((ExceptionCode.MEMBER_NOT_FOUND)));
+
+        return findMember;
     }
 }
