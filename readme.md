@@ -7,4 +7,4 @@
 
 ---------------------------------------
 # 🚀아키텍처
-![제목 없음-2024-07-02-1639.png](..%2F..%2FUsers%2FAdministrator%2FDesktop%2F%EC%A0%9C%EB%AA%A9%20%EC%97%86%EC%9D%8C-2024-07-02-1639.png)
+![제목 없음-2024-07-02-1639](https://github.com/jae-jung-kim/E-commerce_MSA_Project/assets/119948103/89f51511-d5cc-477d-b9c9-1618b632a44c)
